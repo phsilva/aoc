@@ -10,10 +10,8 @@ pub fn day1_part_1() {
         .map(|line| i32::from_str(line.unwrap().as_str()).unwrap())
         .collect();
 
-    for i in 0..(nums.len() - 1) {
-        let n = nums[i];
-        for j in (i + 1)..nums.len() {
-            let m = nums[j];
+    for (i, n) in nums.iter().enumerate() {
+        for m in nums.iter().skip(i + 1) {
             if n + m == 2020 {
                 println!("{} {} {}", n, m, n * m);
                 break;
@@ -30,12 +28,9 @@ pub fn day1_part_2() {
         .map(|line| i32::from_str(line.unwrap().as_str()).unwrap())
         .collect();
 
-    for i in 0..(nums.len() - 1) {
-        let n = nums[i];
-        for j in (i + 1)..nums.len() {
-            let m = nums[j];
-            for k in (j + 1)..nums.len() {
-                let o = nums[k];
+    for (i, n) in nums.iter().enumerate() {
+        for (j, m) in nums.iter().enumerate().skip(i + 1) {
+            for o in nums.iter().skip(j + 1) {
                 if n + m + o == 2020 {
                     println!("{} {} {} {}", n, m, o, n * m * o);
                     break;
