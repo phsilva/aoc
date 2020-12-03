@@ -41,7 +41,7 @@ pub fn day1_part_2() {
 }
 
 #[derive(Debug, Copy, Clone)]
-struct PasswordPolicy {
+pub struct PasswordPolicy {
     min_chars: i32,
     max_chars: i32,
     required_char: char,
@@ -59,7 +59,7 @@ impl PasswordPolicy {
     }
 }
 
-pub fn day2_part_1() {
+pub fn day2_input() -> Vec<(String, PasswordPolicy)> {
     let file = fs::File::open("src/day2.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let passwords: Vec<(String, PasswordPolicy)> = reader
@@ -83,6 +83,11 @@ pub fn day2_part_1() {
         })
         .collect();
 
+    passwords
+}
+pub fn day2_part_1() {
+    let passwords = day2_input();
+
     let mut valid_password = 0;
     for (password, policy) in passwords {
         if policy.is_valid(&password) {
@@ -96,6 +101,6 @@ pub fn day2_part_1() {
 fn main() {
     // day1_part_1();
     // day1_part_2();
-    // day2_part_1();
-    day2_part_2();
+    day2_part_1();
+    // day2_part_2();
 }
