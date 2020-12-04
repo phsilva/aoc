@@ -171,11 +171,94 @@ pub fn day3_part_2() {
     println!("day3: part 3: trees found product {}", large_tree_number);
 }
 
+#[derive(Debug, Default)]
+pub struct Passport {
+    byr: String,
+    iyr: String,
+    eyr: String,
+    hgt: String,
+    hcl: String,
+    ecl: String,
+    pid: String,
+    cid: String,
+}
+
+impl Passport {
+    fn from_str(text: &str) -> Passport {
+        let mut passport = Passport::default();
+
+        let key_values: Vec<&str> = text.split(' ').collect();
+        for kv in key_values {
+            let parts: Vec<&str> = kv.split(':').collect();
+            match parts[0] {
+                "byr" => passport.byr = String::from_str(parts[1]).unwrap(),
+                "iyr" => passport.iyr = String::from_str(parts[1]).unwrap(),
+                "eyr" => passport.eyr = String::from_str(parts[1]).unwrap(),
+                "hgt" => passport.hgt = String::from_str(parts[1]).unwrap(),
+                "hcl" => passport.hcl = String::from_str(parts[1]).unwrap(),
+                "ecl" => passport.ecl = String::from_str(parts[1]).unwrap(),
+                "pid" => passport.pid = String::from_str(parts[1]).unwrap(),
+                "cid" => passport.cid = String::from_str(parts[1]).unwrap(),
+                _ => (),
+            }
+        }
+
+        passport
+    }
+
+    fn is_valid(&self) -> bool {
+        // need to have everything but self.cid
+        let valid = !self.byr.is_empty()
+            && !self.iyr.is_empty()
+            && !self.eyr.is_empty()
+            && !self.hgt.is_empty()
+            && !self.hcl.is_empty()
+            && !self.ecl.is_empty()
+            && !self.pid.is_empty();
+        dbg!(self, valid);
+        valid
+    }
+}
+
+pub fn day4_input() -> Vec<Passport> {
+    let file = fs::File::open("src/day4.input.txt").unwrap();
+    let reader = io::BufReader::new(file);
+
+    let mut passports = Vec::new();
+
+    let mut current_passport = String::new();
+    for line in reader.lines() {
+        let line = line.unwrap();
+        if line.is_empty() {
+            passports.push(Passport::from_str(&current_passport));
+            current_passport.clear();
+            continue;
+        }
+
+        current_passport += &(String::from_str(" ").unwrap() + &line.clone());
+    }
+
+    passports
+}
+pub fn day4_part_1() {
+    let passports = day4_input();
+
+    let valid = passports
+        .into_iter()
+        .filter(|passport| passport.is_valid())
+        .count();
+    println!("day4/1: valid passports: {}", valid);
+}
+
+pub fn day4_part_2() {}
+
 fn main() {
-    day1_part_1();
-    day1_part_2();
-    day2_part_1();
-    day2_part_2();
-    day3_part_1();
-    day3_part_2();
+    // day1_part_1();
+    // day1_part_2();
+    // day2_part_1();
+    // day2_part_2();
+    // day3_part_1();
+    // day3_part_2();
+    day4_part_1();
+    // day4_part_2();
 }
