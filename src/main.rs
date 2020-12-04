@@ -171,7 +171,6 @@ pub fn day3_part_2() {
     println!("day3: part 3: trees found product {}", large_tree_number);
 }
 
-
 fn main() {
     day1_part_1();
     day1_part_2();
