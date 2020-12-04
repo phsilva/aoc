@@ -130,7 +130,7 @@ pub fn day3_input() -> Day3Map {
     map
 }
 
-pub fn tree_finder(map: &Day3Map, right: usize, down: usize) -> i32 {
+pub fn tree_finder(map: &Day3Map, right: usize, down: usize) -> i64 {
     let mut trees = 0;
     let mut x = 0;
     let mut y = 0;
@@ -159,11 +159,24 @@ pub fn day3_part_1() {
     println!("day3: part 1: trees found {}", trees);
 }
 
+pub fn day3_part_2() {
+    let map = day3_input();
+    let slopes = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
+
+    let large_tree_number: i64 = slopes
+        .iter()
+        .map(|slope| tree_finder(&map, slope.0, slope.1))
+        .product();
+
+    println!("day3: part 3: trees found product {}", large_tree_number);
+}
+
+
 fn main() {
-    // day1_part_1();
-    // day1_part_2();
-    // day2_part_1();
-    // day2_part_2();
+    day1_part_1();
+    day1_part_2();
+    day2_part_1();
+    day2_part_2();
     day3_part_1();
-    // day3_part_2();
+    day3_part_2();
 }
