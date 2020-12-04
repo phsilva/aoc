@@ -117,9 +117,53 @@ pub fn day2_part_2() {
     println!("really valid password: {}", really_valid_password);
 }
 
+pub fn day3_input() -> Vec<Vec<char>> {
+    let file = fs::File::open("src/day3.input.txt").unwrap();
+    let reader = io::BufReader::new(file);
+    let map: Vec<Vec<char>> = reader
+        .lines()
+        .map(|line| line.unwrap().chars().collect())
+        .collect();
+
+    map
+}
+
+pub fn day3_part_1() {
+    let map = day3_input();
+    
+    const RIGHT: usize = 3;
+    const DOWN: usize = 1;
+
+    dbg!(RIGHT, DOWN);
+
+    let mut trees = 0;
+    let mut x = 0;
+    let mut y = 0;
+    let rows = map.len();
+    let cols = map[0].len();
+
+    loop {
+        x = (x + RIGHT) % cols;
+        y += DOWN;
+
+        if y > rows - 1 {
+            break;
+        }
+
+        
+        if map[y][x] == '#' {
+            trees += 1;
+        }
+    }
+
+    println!("trees found {}", trees);
+}
+
 fn main() {
     // day1_part_1();
     // day1_part_2();
     // day2_part_1();
-    day2_part_2();
+    // day2_part_2();
+    day3_part_1();
+    // day3_part_2();
 }
