@@ -173,9 +173,9 @@ pub fn day3_part_2() {
 
 #[derive(Debug, Default)]
 pub struct Passport {
-    byr: i32,
-    iyr: i32,
-    eyr: i32,
+    byr: String,
+    iyr: String,
+    eyr: String,
     hgt: String,
     hcl: String,
     ecl: String,
@@ -191,9 +191,9 @@ impl Passport {
         for kv in key_values {
             let parts: Vec<&str> = kv.split(':').collect();
             match parts[0] {
-                "byr" => passport.byr = parts[1].parse::<i32>().unwrap_or_default(),
-                "iyr" => passport.iyr = parts[1].parse::<i32>().unwrap_or_default(),
-                "eyr" => passport.eyr = parts[1].parse::<i32>().unwrap_or_default(),
+                "byr" => passport.byr = String::from_str(parts[1]).unwrap(),
+                "iyr" => passport.iyr = String::from_str(parts[1]).unwrap(),
+                "eyr" => passport.eyr = String::from_str(parts[1]).unwrap(),
                 "hgt" => passport.hgt = String::from_str(parts[1]).unwrap(),
                 "hcl" => passport.hcl = String::from_str(parts[1]).unwrap(),
                 "ecl" => passport.ecl = String::from_str(parts[1]).unwrap(),
@@ -219,15 +219,15 @@ impl Passport {
     }
 
     fn valid_byr(&self) -> bool {
-        self.byr != 0
+        !self.byr.is_empty()
     }
 
     fn valid_iyr(&self) -> bool {
-        self.iyr != 0
+        !self.iyr.is_empty()
     }
 
     fn valid_eyr(&self) -> bool {
-        self.eyr != 0
+        !self.eyr.is_empty()
     }
 
     fn valid_hgt(&self) -> bool {
@@ -244,6 +244,81 @@ impl Passport {
 
     fn valid_pid(&self) -> bool {
         !self.pid.is_empty()
+    }
+
+    fn is_really_valid(&self) -> bool {
+        // need to have everything but self.cid
+        let valid = self.really_valid_byr()
+            && self.really_valid_iyr()
+            && self.really_valid_eyr()
+            && self.really_valid_hgt()
+            && self.really_valid_hcl()
+            && self.really_valid_ecl()
+            && self.really_valid_pid();
+        valid
+    }
+
+    fn really_valid_byr(&self) -> bool {
+        let byr: i32 = self.byr.parse().unwrap_or_default();
+        let mut valid = self.byr.chars().filter(|c| c.is_ascii_digit()).count() == 4;
+        valid &= byr >= 1920 && byr <= 2002;
+        valid
+    }
+
+    fn really_valid_iyr(&self) -> bool {
+        let iyr: i32 = self.iyr.parse().unwrap_or_default();
+        let mut valid = self.iyr.chars().filter(|c| c.is_ascii_digit()).count() == 4;
+        valid &= iyr >= 2010 && iyr <= 2020;
+        valid
+    }
+
+    fn really_valid_eyr(&self) -> bool {
+        let eyr: i32 = self.eyr.parse().unwrap_or_default();
+        let mut valid = self.eyr.chars().filter(|c| c.is_ascii_digit()).count() == 4;
+        valid &= eyr >= 2020 && eyr <= 2030;
+        valid
+    }
+
+    fn really_valid_hgt(&self) -> bool {
+        let mut valid = !self.hgt.is_empty();
+        if !valid {
+            return false;
+        }
+
+        let is_inch = self.hgt.ends_with("in");
+        if is_inch {
+            let h = self.hgt[..2].parse::<i32>().unwrap_or_default();
+            valid &= h >= 59 && h <= 76;
+            return valid;
+        }
+        let is_cm = self.hgt.ends_with("cm");
+        if is_cm {
+            let h = self.hgt[..3].parse::<i32>().unwrap_or_default();
+            valid &= h >= 150 && h <= 193;
+            return valid;
+        }
+
+        false
+    }
+
+    fn really_valid_hcl(&self) -> bool {
+        let mut valid = !self.hcl.is_empty();
+        valid &= self.hcl.starts_with("#");
+        if !valid {
+            return false;
+        }
+        let color = String::from_str(&self.hcl[1..]).unwrap();
+        valid &= color.chars().filter(|c| c.is_ascii_hexdigit()).count() == 6;
+        valid
+    }
+
+    fn really_valid_ecl(&self) -> bool {
+        let valid_eye_colors = vec!["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
+        valid_eye_colors.contains(&self.ecl.as_str())
+    }
+
+    fn really_valid_pid(&self) -> bool {
+        self.pid.chars().filter(|c| c.is_ascii_digit()).count() == 9
     }
 }
 
@@ -267,6 +342,7 @@ pub fn day4_input() -> Vec<Passport> {
 
     passports
 }
+
 pub fn day4_part_1() {
     let passports = day4_input();
 
@@ -277,7 +353,15 @@ pub fn day4_part_1() {
     println!("day4/1: valid passports: {}", valid);
 }
 
-pub fn day4_part_2() {}
+pub fn day4_part_2() {
+    let passports = day4_input();
+
+    let really_valid = passports
+        .into_iter()
+        .filter(|passport| passport.is_really_valid())
+        .count();
+    println!("day4/1: really valid passports: {}", really_valid);
+}
 
 fn main() {
     // day1_part_1();
@@ -287,5 +371,5 @@ fn main() {
     // day3_part_1();
     // day3_part_2();
     day4_part_1();
-    // day4_part_2();
+    day4_part_2();
 }
