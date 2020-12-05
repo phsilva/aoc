@@ -173,9 +173,9 @@ pub fn day3_part_2() {
 
 #[derive(Debug, Default)]
 pub struct Passport {
-    byr: String,
-    iyr: String,
-    eyr: String,
+    byr: i32,
+    iyr: i32,
+    eyr: i32,
     hgt: String,
     hcl: String,
     ecl: String,
@@ -191,9 +191,9 @@ impl Passport {
         for kv in key_values {
             let parts: Vec<&str> = kv.split(':').collect();
             match parts[0] {
-                "byr" => passport.byr = String::from_str(parts[1]).unwrap(),
-                "iyr" => passport.iyr = String::from_str(parts[1]).unwrap(),
-                "eyr" => passport.eyr = String::from_str(parts[1]).unwrap(),
+                "byr" => passport.byr = parts[1].parse::<i32>().unwrap_or_default(),
+                "iyr" => passport.iyr = parts[1].parse::<i32>().unwrap_or_default(),
+                "eyr" => passport.eyr = parts[1].parse::<i32>().unwrap_or_default(),
                 "hgt" => passport.hgt = String::from_str(parts[1]).unwrap(),
                 "hcl" => passport.hcl = String::from_str(parts[1]).unwrap(),
                 "ecl" => passport.ecl = String::from_str(parts[1]).unwrap(),
@@ -208,15 +208,42 @@ impl Passport {
 
     fn is_valid(&self) -> bool {
         // need to have everything but self.cid
-        let valid = !self.byr.is_empty()
-            && !self.iyr.is_empty()
-            && !self.eyr.is_empty()
-            && !self.hgt.is_empty()
-            && !self.hcl.is_empty()
-            && !self.ecl.is_empty()
-            && !self.pid.is_empty();
-        dbg!(self, valid);
+        let valid = self.valid_byr()
+            && self.valid_iyr()
+            && self.valid_eyr()
+            && self.valid_hgt()
+            && self.valid_hcl()
+            && self.valid_ecl()
+            && self.valid_pid();
         valid
+    }
+
+    fn valid_byr(&self) -> bool {
+        self.byr != 0
+    }
+
+    fn valid_iyr(&self) -> bool {
+        self.iyr != 0
+    }
+
+    fn valid_eyr(&self) -> bool {
+        self.eyr != 0
+    }
+
+    fn valid_hgt(&self) -> bool {
+        !self.hgt.is_empty()
+    }
+
+    fn valid_hcl(&self) -> bool {
+        !self.hcl.is_empty()
+    }
+
+    fn valid_ecl(&self) -> bool {
+        !self.ecl.is_empty()
+    }
+
+    fn valid_pid(&self) -> bool {
+        !self.pid.is_empty()
     }
 }
 
