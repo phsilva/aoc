@@ -1,4 +1,4 @@
-use std::fs;
+use std::{collections::HashSet, fs};
 use std::io::{self, BufRead};
 
 pub fn day1_part_1() -> Option<(i32, i32, i32)> {
@@ -405,7 +405,7 @@ fn day5_input() -> Vec<String> {
     let boarding_passes: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
     boarding_passes
 }
-fn day5_part_1() {
+pub fn day5_part_1() {
     let max_id = day5_input()
         .iter()
         .map(|boarding_pass| seat_id(decode_boarding_pass(boarding_pass)))
@@ -414,8 +414,8 @@ fn day5_part_1() {
     println!("day5/1: {}", max_id);
 }
 
-fn day5_part_2() {
-    let seats: Vec<u32> = day5_input()
+pub fn day5_part_2() {
+    let seats: HashSet<u32> = day5_input()
         .iter()
         .map(|boarding_pass| seat_id(decode_boarding_pass(boarding_pass)))
         .collect();
@@ -432,15 +432,15 @@ fn day5_part_2() {
 }
 
 fn main() {
-    day1_part_1();
-    day1_part_2();
-    day2_part_1();
-    day2_part_2();
-    day3_part_1();
-    day3_part_2();
-    day4_part_1();
-    day4_part_2();
-    day5_part_1();
+    // day1_part_1();
+    // day1_part_2();
+    // day2_part_1();
+    // day2_part_2();
+    // day3_part_1();
+    // day3_part_2();
+    // day4_part_1();
+    // day4_part_2();
+    // day5_part_1();
     day5_part_2();
 }
 
