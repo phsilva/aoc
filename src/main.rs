@@ -363,6 +363,72 @@ pub fn day4_part_2() {
     println!("day4/1: really valid passports: {}", really_valid);
 }
 
+pub fn decode_boarding_pass(boarding_pass: &str) -> (u8, u8) {
+    let mut row = (0u8, 127u8);
+
+    for c in boarding_pass.chars().take(7) {
+        let gap = ((row.1 - row.0) / 2) + 1;
+        if c == 'B' {
+            row.0 += gap;
+        }
+
+        if c == 'F' {
+            row.1 -= gap;
+        }
+    }
+
+    let mut column = (0u8, 7u8);
+
+    for c in boarding_pass.chars().skip(7).take(3) {
+        let gap = ((column.1 - column.0) / 2) + 1;
+        if c == 'R' {
+            column.0 += gap;
+        }
+
+        if c == 'L' {
+            column.1 -= gap;
+        }
+    }
+
+    (row.0, column.1)
+}
+
+pub fn seat_id(seat: (u8, u8)) -> u32 {
+    (seat.0 as u32 * 8) + seat.1 as u32
+}
+
+fn day5_input() -> Vec<String> {
+    let file = fs::File::open("src/day5.input.txt").unwrap();
+    let reader = io::BufReader::new(file);
+    let boarding_passes: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
+    boarding_passes
+}
+fn day5_part_1() {
+    let max_id = day5_input()
+        .iter()
+        .map(|boarding_pass| seat_id(decode_boarding_pass(boarding_pass)))
+        .max()
+        .unwrap();
+    println!("day5/1: max id: {}", max_id);
+}
+
+fn day5_part_2() {
+    let seats: Vec<u32> = day5_input()
+        .iter()
+        .map(|boarding_pass| seat_id(decode_boarding_pass(boarding_pass)))
+        .collect();
+
+    let min = *seats.iter().min().unwrap();
+    let max = *seats.iter().max().unwrap();
+
+    for seat in min..=max {
+        if !seats.contains(&seat) {
+            println!("day5/2: my seat id: {}", seat);
+            break;
+        }
+    }
+}
+
 fn main() {
     // day1_part_1();
     // day1_part_2();
@@ -370,6 +436,8 @@ fn main() {
     // day2_part_2();
     // day3_part_1();
     // day3_part_2();
-    day4_part_1();
-    day4_part_2();
+    // day4_part_1();
+    // day4_part_2();
+    day5_part_1();
+    day5_part_2();
 }
