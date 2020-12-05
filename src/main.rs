@@ -1,23 +1,24 @@
 use std::fs;
 use std::io::{self, BufRead};
-use std::str::FromStr;
 
-pub fn day1_part_1() {
+pub fn day1_part_1() -> Option<(i32, i32, i32)> {
     let file = fs::File::open("src/day1.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let nums: Vec<i32> = reader
         .lines()
-        .map(|line| i32::from_str(line.unwrap().as_str()).unwrap())
+        .map(|line| line.unwrap().parse().unwrap())
         .collect();
 
     for (i, n) in nums.iter().enumerate() {
         for m in nums.iter().skip(i + 1) {
             if n + m == 2020 {
-                println!("{} {} {}", n, m, n * m);
-                break;
+                println!("day1/1: {} {} {}", n, m, n * m);
+                return Some((*n, *m, n * m));
             }
         }
     }
+
+    None
 }
 
 pub fn day1_part_2() {
@@ -25,14 +26,14 @@ pub fn day1_part_2() {
     let reader = io::BufReader::new(file);
     let nums: Vec<i32> = reader
         .lines()
-        .map(|line| i32::from_str(line.unwrap().as_str()).unwrap())
+        .map(|line| line.unwrap().parse().unwrap())
         .collect();
 
     for (i, n) in nums.iter().enumerate() {
         for (j, m) in nums.iter().enumerate().skip(i + 1) {
             for o in nums.iter().skip(j + 1) {
                 if n + m + o == 2020 {
-                    println!("{} {} {} {}", n, m, o, n * m * o);
+                    println!("day1/2: {} {} {} {}", n, m, o, n * m * o);
                     break;
                 }
             }
@@ -74,8 +75,8 @@ pub fn day2_input() -> Vec<(String, PasswordPolicy)> {
             let line = line.unwrap();
             let parts: Vec<&str> = line.split(' ').collect();
             let minmax: Vec<&str> = parts[0].split('-').collect();
-            let min_chars = usize::from_str(minmax[0]).unwrap();
-            let max_chars = usize::from_str(minmax[1]).unwrap();
+            let min_chars: usize = minmax[0].parse().unwrap();
+            let max_chars: usize = minmax[1].parse().unwrap();
             let required_char = parts[1].chars().next().unwrap();
             let password = parts[2];
             (
@@ -101,7 +102,7 @@ pub fn day2_part_1() {
         }
     }
 
-    println!("valid password: {}", valid_password);
+    println!("day2/1: {}", valid_password);
 }
 
 pub fn day2_part_2() {
@@ -114,7 +115,7 @@ pub fn day2_part_2() {
         }
     }
 
-    println!("really valid password: {}", really_valid_password);
+    println!("day2/2: {}", really_valid_password);
 }
 
 type Day3Map = Vec<Vec<char>>;
@@ -156,7 +157,7 @@ pub fn tree_finder(map: &Day3Map, right: usize, down: usize) -> i64 {
 pub fn day3_part_1() {
     let map = day3_input();
     let trees = tree_finder(&map, 3, 1);
-    println!("day3: part 1: trees found {}", trees);
+    println!("day3/1: {}", trees);
 }
 
 pub fn day3_part_2() {
@@ -168,7 +169,7 @@ pub fn day3_part_2() {
         .map(|slope| tree_finder(&map, slope.0, slope.1))
         .product();
 
-    println!("day3: part 3: trees found product {}", large_tree_number);
+    println!("day3/2: {}", large_tree_number);
 }
 
 #[derive(Debug, Default)]
@@ -191,14 +192,14 @@ impl Passport {
         for kv in key_values {
             let parts: Vec<&str> = kv.split(':').collect();
             match parts[0] {
-                "byr" => passport.byr = String::from_str(parts[1]).unwrap(),
-                "iyr" => passport.iyr = String::from_str(parts[1]).unwrap(),
-                "eyr" => passport.eyr = String::from_str(parts[1]).unwrap(),
-                "hgt" => passport.hgt = String::from_str(parts[1]).unwrap(),
-                "hcl" => passport.hcl = String::from_str(parts[1]).unwrap(),
-                "ecl" => passport.ecl = String::from_str(parts[1]).unwrap(),
-                "pid" => passport.pid = String::from_str(parts[1]).unwrap(),
-                "cid" => passport.cid = String::from_str(parts[1]).unwrap(),
+                "byr" => passport.byr = parts[1].into(),
+                "iyr" => passport.iyr = parts[1].into(),
+                "eyr" => passport.eyr = parts[1].into(),
+                "hgt" => passport.hgt = parts[1].into(),
+                "hcl" => passport.hcl = parts[1].into(),
+                "ecl" => passport.ecl = parts[1].into(),
+                "pid" => passport.pid = parts[1].into(),
+                "cid" => passport.cid = parts[1].into(),
                 _ => (),
             }
         }
@@ -307,7 +308,7 @@ impl Passport {
         if !valid {
             return false;
         }
-        let color = String::from_str(&self.hcl[1..]).unwrap();
+        let color = &self.hcl[1..];
         valid &= color.chars().filter(|c| c.is_ascii_hexdigit()).count() == 6;
         valid
     }
@@ -337,7 +338,8 @@ pub fn day4_input() -> Vec<Passport> {
             continue;
         }
 
-        current_passport += &(String::from_str(" ").unwrap() + &line.clone());
+        current_passport.push_str(" ");
+        current_passport.push_str(&line);
     }
 
     passports
@@ -350,7 +352,7 @@ pub fn day4_part_1() {
         .into_iter()
         .filter(|passport| passport.is_valid())
         .count();
-    println!("day4/1: valid passports: {}", valid);
+    println!("day4/1: {}", valid);
 }
 
 pub fn day4_part_2() {
@@ -360,7 +362,7 @@ pub fn day4_part_2() {
         .into_iter()
         .filter(|passport| passport.is_really_valid())
         .count();
-    println!("day4/1: really valid passports: {}", really_valid);
+    println!("day4/2: {}", really_valid);
 }
 
 pub fn decode_boarding_pass(boarding_pass: &str) -> (u8, u8) {
@@ -409,7 +411,7 @@ fn day5_part_1() {
         .map(|boarding_pass| seat_id(decode_boarding_pass(boarding_pass)))
         .max()
         .unwrap();
-    println!("day5/1: max id: {}", max_id);
+    println!("day5/1: {}", max_id);
 }
 
 fn day5_part_2() {
@@ -423,21 +425,40 @@ fn day5_part_2() {
 
     for seat in min..=max {
         if !seats.contains(&seat) {
-            println!("day5/2: my seat id: {}", seat);
+            println!("day5/2: {}", seat);
             break;
         }
     }
 }
 
 fn main() {
-    // day1_part_1();
-    // day1_part_2();
-    // day2_part_1();
-    // day2_part_2();
-    // day3_part_1();
-    // day3_part_2();
-    // day4_part_1();
-    // day4_part_2();
+    day1_part_1();
+    day1_part_2();
+    day2_part_1();
+    day2_part_2();
+    day3_part_1();
+    day3_part_2();
+    day4_part_1();
+    day4_part_2();
     day5_part_1();
     day5_part_2();
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn aoc2020() {
+        assert_eq!((455i32, 1565i32, 712075i32), day1_part_1().unwrap());
+        // assert_eq!((1142,695,183,145245270), day1_part_2());
+        // assert_eq!(640, day2_part_1());
+        // assert_eq!(472, day2_part_2());
+        // assert_eq!(232, day3_part_1());
+        // assert_eq!(3952291680, day3_part_2());
+        // assert_eq!(230, day4_part_1());
+        // assert_eq!(156, day4_part_2());
+        // assert_eq!(928, day5_part_1());
+        // assert_eq!(610, day5_part_2());
+    }
 }
