@@ -390,7 +390,7 @@ pub fn decode_boarding_pass(boarding_pass: &str) -> (u8, u8) {
         }
     }
 
-    (row.0, column.1)
+    (row.0, column.0)
 }
 
 pub fn seat_id(seat: (u8, u8)) -> u32 {
