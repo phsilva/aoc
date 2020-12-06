@@ -431,32 +431,33 @@ pub fn day5_part_2() {
     }
 }
 
-fn day6_input() -> Vec<String> {
+fn day6_input() -> Vec<Vec<String>> {
     let file = fs::File::open("src/day6.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let mut answers = Vec::new();
 
-    let mut current_answer = String::new();
+    let mut current_answers = Vec::new();
     for line in reader.lines() {
         let line = line.unwrap();
         if line.is_empty() {
-            answers.push(current_answer.clone());
-            current_answer.clear();
+            answers.push(current_answers.clone());
+            current_answers.clear();
             continue;
         }
 
-        current_answer.push_str(&line);
+        current_answers.push(line.clone());
     }
 
     answers
 }
 
-pub fn day6_part_1() {
+pub fn day6_part_1() -> usize {
     let answers = day6_input();
     let sum_answers: usize = answers
         .iter()
-        .map(|answer| answer.chars().collect::<HashSet<char>>().len()).sum();
+        .map(|answers| answers.concat().chars().collect::<HashSet<char>>().len()).sum();
     println!("day6/1: {}", sum_answers);
+    sum_answers
 }
 
 pub fn day6_part_2() {
@@ -494,5 +495,6 @@ mod test {
         // assert_eq!(156, day4_part_2());
         // assert_eq!(928, day5_part_1());
         // assert_eq!(610, day5_part_2());
+        assert_eq!(6521, day6_part_1());
     }
 }
