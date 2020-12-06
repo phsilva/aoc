@@ -1,5 +1,5 @@
-use std::{collections::HashSet, fs};
 use std::io::{self, BufRead};
+use std::{collections::HashSet, fs};
 
 pub fn day1_part_1() -> Option<(i32, i32, i32)> {
     let file = fs::File::open("src/day1.input.txt").unwrap();
@@ -431,6 +431,38 @@ pub fn day5_part_2() {
     }
 }
 
+fn day6_input() -> Vec<String> {
+    let file = fs::File::open("src/day6.input.txt").unwrap();
+    let reader = io::BufReader::new(file);
+    let mut answers = Vec::new();
+
+    let mut current_answer = String::new();
+    for line in reader.lines() {
+        let line = line.unwrap();
+        if line.is_empty() {
+            answers.push(current_answer.clone());
+            current_answer.clear();
+            continue;
+        }
+
+        current_answer.push_str(&line);
+    }
+
+    answers
+}
+
+pub fn day6_part_1() {
+    let answers = day6_input();
+    let sum_answers: usize = answers
+        .iter()
+        .map(|answer| answer.chars().collect::<HashSet<char>>().len()).sum();
+    println!("day6/1: {}", sum_answers);
+}
+
+pub fn day6_part_2() {
+    // let data = day6_input();
+}
+
 fn main() {
     // day1_part_1();
     // day1_part_2();
@@ -441,7 +473,9 @@ fn main() {
     // day4_part_1();
     // day4_part_2();
     // day5_part_1();
-    day5_part_2();
+    // day5_part_2();
+    day6_part_1();
+    day6_part_2();
 }
 
 #[cfg(test)]
