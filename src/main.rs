@@ -1,3 +1,5 @@
+#![feature(iterator_fold_self)]
+
 use std::io::{self, BufRead};
 use std::{collections::HashSet, fs};
 
@@ -60,8 +62,8 @@ impl PasswordPolicy {
     }
 
     fn is_really_valid(self, password: &str) -> bool {
-        let c1 = password.chars().skip(self.min_chars - 1).next().unwrap();
-        let c2 = password.chars().skip(self.max_chars - 1).next().unwrap();
+        let c1 = password.chars().nth(self.min_chars - 1).unwrap();
+        let c2 = password.chars().nth(self.max_chars - 1).unwrap();
         (c1 == self.required_char) ^ (c2 == self.required_char)
     }
 }
@@ -209,14 +211,13 @@ impl Passport {
 
     fn is_valid(&self) -> bool {
         // need to have everything but self.cid
-        let valid = self.valid_byr()
+        self.valid_byr()
             && self.valid_iyr()
             && self.valid_eyr()
             && self.valid_hgt()
             && self.valid_hcl()
             && self.valid_ecl()
-            && self.valid_pid();
-        valid
+            && self.valid_pid()
     }
 
     fn valid_byr(&self) -> bool {
@@ -249,34 +250,33 @@ impl Passport {
 
     fn is_really_valid(&self) -> bool {
         // need to have everything but self.cid
-        let valid = self.really_valid_byr()
+        self.really_valid_byr()
             && self.really_valid_iyr()
             && self.really_valid_eyr()
             && self.really_valid_hgt()
             && self.really_valid_hcl()
             && self.really_valid_ecl()
-            && self.really_valid_pid();
-        valid
+            && self.really_valid_pid()
     }
 
     fn really_valid_byr(&self) -> bool {
         let byr: i32 = self.byr.parse().unwrap_or_default();
         let mut valid = self.byr.chars().filter(|c| c.is_ascii_digit()).count() == 4;
-        valid &= byr >= 1920 && byr <= 2002;
+        valid &= (1920..=2002).contains(&byr);
         valid
     }
 
     fn really_valid_iyr(&self) -> bool {
         let iyr: i32 = self.iyr.parse().unwrap_or_default();
         let mut valid = self.iyr.chars().filter(|c| c.is_ascii_digit()).count() == 4;
-        valid &= iyr >= 2010 && iyr <= 2020;
+        valid &= (2010..=2020).contains(&iyr);
         valid
     }
 
     fn really_valid_eyr(&self) -> bool {
         let eyr: i32 = self.eyr.parse().unwrap_or_default();
         let mut valid = self.eyr.chars().filter(|c| c.is_ascii_digit()).count() == 4;
-        valid &= eyr >= 2020 && eyr <= 2030;
+        valid &= (2020..=2030).contains(&eyr);
         valid
     }
 
@@ -289,13 +289,13 @@ impl Passport {
         let is_inch = self.hgt.ends_with("in");
         if is_inch {
             let h = self.hgt[..2].parse::<i32>().unwrap_or_default();
-            valid &= h >= 59 && h <= 76;
+            valid &= (59..=76).contains(&h);
             return valid;
         }
         let is_cm = self.hgt.ends_with("cm");
         if is_cm {
             let h = self.hgt[..3].parse::<i32>().unwrap_or_default();
-            valid &= h >= 150 && h <= 193;
+            valid &= (150..=193).contains(&h);
             return valid;
         }
 
@@ -304,7 +304,7 @@ impl Passport {
 
     fn really_valid_hcl(&self) -> bool {
         let mut valid = !self.hcl.is_empty();
-        valid &= self.hcl.starts_with("#");
+        valid &= self.hcl.starts_with('#');
         if !valid {
             return false;
         }
@@ -338,7 +338,7 @@ pub fn day4_input() -> Vec<Passport> {
             continue;
         }
 
-        current_passport.push_str(" ");
+        current_passport.push(' ');
         current_passport.push_str(&line);
     }
 
@@ -455,13 +455,37 @@ pub fn day6_part_1() -> usize {
     let answers = day6_input();
     let sum_answers: usize = answers
         .iter()
-        .map(|answers| answers.concat().chars().collect::<HashSet<char>>().len()).sum();
+        .map(|answers| answers.concat().chars().collect::<HashSet<char>>().len())
+        .sum();
     println!("day6/1: {}", sum_answers);
     sum_answers
 }
 
-pub fn day6_part_2() {
-    // let data = day6_input();
+pub fn day6_part_2() -> u32 {
+    let answers = day6_input();
+
+    fn str_as_bits(s: &str) -> u32 {
+        let mut n: u32 = 0;
+        for c in s.chars() {
+            let offset = c as u8 - b'a';
+            n |= 1 << offset;
+        }
+        n
+    }
+
+    let mut sum_ansers = 0;
+
+    for group in answers {
+        let bit_answers: Vec<u32> = group.iter().map(|answer| str_as_bits(answer)).collect();
+        sum_ansers += bit_answers
+            .into_iter()
+            .fold_first(|a, b| a & b)
+            .unwrap()
+            .count_ones();
+    }
+
+    println!("day6/2: {}", sum_ansers);
+    sum_ansers
 }
 
 fn main() {
@@ -485,7 +509,7 @@ mod test {
 
     #[test]
     fn aoc2020() {
-        assert_eq!((455i32, 1565i32, 712075i32), day1_part_1().unwrap());
+        assert_eq!((455, 1565, 712075), day1_part_1().unwrap());
         // assert_eq!((1142,695,183,145245270), day1_part_2());
         // assert_eq!(640, day2_part_1());
         // assert_eq!(472, day2_part_2());
@@ -496,5 +520,6 @@ mod test {
         // assert_eq!(928, day5_part_1());
         // assert_eq!(610, day5_part_2());
         assert_eq!(6521, day6_part_1());
+        assert_eq!(3305, day6_part_2());
     }
 }
