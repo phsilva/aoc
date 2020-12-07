@@ -496,7 +496,7 @@ pub struct Bag {
     color: String,
 }
 
-fn day7_input() -> Vec<(String, String)> {
+fn day7_input() -> Vec<(String, String, i32)> {
     let file = fs::File::open("src/day7.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let mut nodes = HashMap::new();
@@ -514,9 +514,9 @@ fn day7_input() -> Vec<(String, String)> {
 
         let bag_links: Vec<&str> = parts[1].split(',').collect();
         for bag_link in bag_links {
-            let other_bag_color = bag_link
-                .trim()
-                .split(' ')
+            let bag_link_parts = bag_link.trim().split(' ');
+
+            let other_bag_color = bag_link_parts
                 .skip(1)
                 .take(2)
                 .collect::<Vec<&str>>()
@@ -524,8 +524,15 @@ fn day7_input() -> Vec<(String, String)> {
             let other_bag = Bag {
                 color: other_bag_color.clone(),
             };
+            let bag_link_parts = bag_link.trim().split(' ').collect::<Vec<&str>>();
+
+            let other_bag_capacity: i32 = bag_link_parts[0].parse().unwrap_or(0);
             nodes.insert(other_bag_color.clone(), other_bag);
-            edges.push((this_bag_color.clone(), other_bag_color.clone()));
+            edges.push((
+                this_bag_color.clone(),
+                other_bag_color.clone(),
+                other_bag_capacity,
+            ));
         }
     }
 
@@ -543,7 +550,7 @@ pub fn day7_part_1() -> usize {
     while !colors_to_visit.is_empty() {
         let current_visit = colors_to_visit.pop().unwrap();
 
-        for (e1, e2) in edges.iter() {
+        for (e1, e2, _) in edges.iter() {
             if *e2 == current_visit {
                 colors.insert(e1.clone());
                 colors_to_visit.push(e1.clone());
@@ -555,8 +562,29 @@ pub fn day7_part_1() -> usize {
     colors.len()
 }
 
-pub fn day7_part_2() {
-    // let answers = day7_input();
+pub fn day7_part_2() -> i32 {
+    let edges = day7_input();
+
+    let mut colors_to_visit = Vec::new();
+    let mut total_bags = 0;
+
+    colors_to_visit.push("shiny gold".to_string());
+
+    while !colors_to_visit.is_empty() {
+        let current_visit = colors_to_visit.pop().unwrap();
+
+        for (e1, e2, c) in edges.iter() {
+            if *e1 == current_visit {
+                for _ in 0..*c {
+                    colors_to_visit.push(e2.clone());
+                    total_bags += 1;
+                }
+            }
+        }
+    }
+
+    println!("day7/2: {}", total_bags);
+    total_bags
 }
 
 fn main() {
@@ -573,7 +601,7 @@ fn main() {
     // day6_part_1();
     // day6_part_2();
     day7_part_1();
-    // day7_part_2();
+    day7_part_2();
 }
 
 #[cfg(test)]
@@ -595,6 +623,6 @@ mod test {
         assert_eq!(6521, day6_part_1());
         assert_eq!(3305, day6_part_2());
         assert_eq!(126, day7_part_1());
-        // assert_eq!(3305, day7_part_2());
+        assert_eq!(220149, day7_part_2());
     }
 }
