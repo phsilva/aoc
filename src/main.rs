@@ -1,6 +1,9 @@
 #![feature(iterator_fold_self)]
 
-use std::io::{self, BufRead};
+use std::{
+    collections::HashMap,
+    io::{self, BufRead},
+};
 use std::{collections::HashSet, fs};
 
 pub fn day1_part_1() -> Option<(i32, i32, i32)> {
@@ -488,6 +491,74 @@ pub fn day6_part_2() -> u32 {
     sum_ansers
 }
 
+#[derive(Debug)]
+pub struct Bag {
+    color: String,
+}
+
+fn day7_input() -> Vec<(String, String)> {
+    let file = fs::File::open("src/day7.input.txt").unwrap();
+    let reader = io::BufReader::new(file);
+    let mut nodes = HashMap::new();
+    let mut edges = Vec::new();
+
+    for line in reader.lines() {
+        let line = line.unwrap();
+        let parts: Vec<&str> = line.split("contain").collect();
+        let this_bag_color = parts[0].split(' ').take(2).collect::<Vec<&str>>().join(" ");
+        let this_bag = Bag {
+            color: this_bag_color.clone(),
+        };
+
+        nodes.insert(this_bag_color.clone(), this_bag);
+
+        let bag_links: Vec<&str> = parts[1].split(',').collect();
+        for bag_link in bag_links {
+            let other_bag_color = bag_link
+                .trim()
+                .split(' ')
+                .skip(1)
+                .take(2)
+                .collect::<Vec<&str>>()
+                .join(" ");
+            let other_bag = Bag {
+                color: other_bag_color.clone(),
+            };
+            nodes.insert(other_bag_color.clone(), other_bag);
+            edges.push((this_bag_color.clone(), other_bag_color.clone()));
+        }
+    }
+
+    edges
+}
+
+pub fn day7_part_1() -> usize {
+    let edges = day7_input();
+
+    let mut colors = HashSet::new();
+    let mut colors_to_visit = Vec::new();
+
+    colors_to_visit.push("shiny gold".to_string());
+
+    while !colors_to_visit.is_empty() {
+        let current_visit = colors_to_visit.pop().unwrap();
+
+        for (e1, e2) in edges.iter() {
+            if *e2 == current_visit {
+                colors.insert(e1.clone());
+                colors_to_visit.push(e1.clone());
+            }
+        }
+    }
+
+    println!("day7/1: {}", colors.len());
+    colors.len()
+}
+
+pub fn day7_part_2() {
+    // let answers = day7_input();
+}
+
 fn main() {
     // day1_part_1();
     // day1_part_2();
@@ -499,8 +570,10 @@ fn main() {
     // day4_part_2();
     // day5_part_1();
     // day5_part_2();
-    day6_part_1();
-    day6_part_2();
+    // day6_part_1();
+    // day6_part_2();
+    day7_part_1();
+    // day7_part_2();
 }
 
 #[cfg(test)]
@@ -521,5 +594,7 @@ mod test {
         // assert_eq!(610, day5_part_2());
         assert_eq!(6521, day6_part_1());
         assert_eq!(3305, day6_part_2());
+        assert_eq!(126, day7_part_1());
+        // assert_eq!(3305, day7_part_2());
     }
 }
