@@ -3,44 +3,51 @@
 use std::io::{self, BufRead};
 use std::{collections::HashSet, fs};
 
-pub fn day1_part_1() -> Option<(i32, i32, i32)> {
+pub fn day1_part_1() -> i32 {
     let file = fs::File::open("src/day1.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let nums: Vec<i32> = reader
         .lines()
         .map(|line| line.unwrap().parse().unwrap())
         .collect();
+
+    let mut answer: i32 = 0;
 
     for (i, n) in nums.iter().enumerate() {
         for m in nums.iter().skip(i + 1) {
             if n + m == 2020 {
-                println!("day1/1: {} {} {}", n, m, n * m);
-                return Some((*n, *m, n * m));
+                println!("day1/1: {}", n * m);
+                answer = n * m;
             }
         }
     }
 
-    None
+    answer
 }
 
-pub fn day1_part_2() {
+pub fn day1_part_2() -> i32 {
     let file = fs::File::open("src/day1.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let nums: Vec<i32> = reader
         .lines()
         .map(|line| line.unwrap().parse().unwrap())
         .collect();
+
+    let mut answer: i32 = 0;
 
     for (i, n) in nums.iter().enumerate() {
         for (j, m) in nums.iter().enumerate().skip(i + 1) {
             for o in nums.iter().skip(j + 1) {
                 if n + m + o == 2020 {
-                    println!("day1/2: {} {} {} {}", n, m, o, n * m * o);
+                    answer = n * m * o;
+                    println!("day1/2: {}", answer);
                     break;
                 }
             }
         }
     }
+
+    answer
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -94,7 +101,7 @@ pub fn day2_input() -> Vec<(String, PasswordPolicy)> {
 
     passwords
 }
-pub fn day2_part_1() {
+pub fn day2_part_1() -> i32 {
     let passwords = day2_input();
 
     let mut valid_password = 0;
@@ -105,9 +112,10 @@ pub fn day2_part_1() {
     }
 
     println!("day2/1: {}", valid_password);
+    valid_password
 }
 
-pub fn day2_part_2() {
+pub fn day2_part_2() -> i32 {
     let passwords = day2_input();
 
     let mut really_valid_password = 0;
@@ -118,6 +126,7 @@ pub fn day2_part_2() {
     }
 
     println!("day2/2: {}", really_valid_password);
+    really_valid_password
 }
 
 type Day3Map = Vec<Vec<char>>;
@@ -133,7 +142,7 @@ pub fn day3_input() -> Day3Map {
     map
 }
 
-pub fn tree_finder(map: &Day3Map, right: usize, down: usize) -> i64 {
+pub fn tree_finder(map: &[Vec<char>], right: usize, down: usize) -> i64 {
     let mut trees = 0;
     let mut x = 0;
     let mut y = 0;
@@ -156,13 +165,14 @@ pub fn tree_finder(map: &Day3Map, right: usize, down: usize) -> i64 {
     trees
 }
 
-pub fn day3_part_1() {
+pub fn day3_part_1() -> i64 {
     let map = day3_input();
     let trees = tree_finder(&map, 3, 1);
     println!("day3/1: {}", trees);
+    trees
 }
 
-pub fn day3_part_2() {
+pub fn day3_part_2() -> i64 {
     let map = day3_input();
     let slopes = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
 
@@ -172,6 +182,7 @@ pub fn day3_part_2() {
         .product();
 
     println!("day3/2: {}", large_tree_number);
+    large_tree_number
 }
 
 #[derive(Debug, Default)]
@@ -345,7 +356,7 @@ pub fn day4_input() -> Vec<Passport> {
     passports
 }
 
-pub fn day4_part_1() {
+pub fn day4_part_1() -> usize {
     let passports = day4_input();
 
     let valid = passports
@@ -353,9 +364,10 @@ pub fn day4_part_1() {
         .filter(|passport| passport.is_valid())
         .count();
     println!("day4/1: {}", valid);
+    valid
 }
 
-pub fn day4_part_2() {
+pub fn day4_part_2() -> usize {
     let passports = day4_input();
 
     let really_valid = passports
@@ -363,6 +375,7 @@ pub fn day4_part_2() {
         .filter(|passport| passport.is_really_valid())
         .count();
     println!("day4/2: {}", really_valid);
+    really_valid
 }
 
 pub fn decode_boarding_pass(boarding_pass: &str) -> (u8, u8) {
@@ -405,16 +418,17 @@ fn day5_input() -> Vec<String> {
     let boarding_passes: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
     boarding_passes
 }
-pub fn day5_part_1() {
+pub fn day5_part_1() -> u32 {
     let max_id = day5_input()
         .iter()
         .map(|boarding_pass| seat_id(decode_boarding_pass(boarding_pass)))
         .max()
         .unwrap();
     println!("day5/1: {}", max_id);
+    max_id
 }
 
-pub fn day5_part_2() {
+pub fn day5_part_2() -> u32 {
     let seats: HashSet<u32> = day5_input()
         .iter()
         .map(|boarding_pass| seat_id(decode_boarding_pass(boarding_pass)))
@@ -423,12 +437,17 @@ pub fn day5_part_2() {
     let min = *seats.iter().min().unwrap();
     let max = *seats.iter().max().unwrap();
 
+    let mut my_seat = 0;
+
     for seat in min..=max {
         if !seats.contains(&seat) {
-            println!("day5/2: {}", seat);
+            my_seat = seat;
+            println!("day5/2: {}", my_seat);
             break;
         }
     }
+
+    my_seat
 }
 
 fn day6_input() -> Vec<Vec<String>> {
@@ -569,22 +588,7 @@ pub fn day7_part_2() -> i32 {
     total_bags
 }
 
-fn main() {
-    // day1_part_1();
-    // day1_part_2();
-    // day2_part_1();
-    // day2_part_2();
-    // day3_part_1();
-    // day3_part_2();
-    // day4_part_1();
-    // day4_part_2();
-    // day5_part_1();
-    // day5_part_2();
-    // day6_part_1();
-    // day6_part_2();
-    day7_part_1();
-    day7_part_2();
-}
+fn main() {}
 
 #[cfg(test)]
 mod test {
@@ -592,32 +596,32 @@ mod test {
 
     #[test]
     fn day1() {
-        assert_eq!((455, 1565, 712075), day1_part_1().unwrap());
-        // assert_eq!((1142,695,183,145245270), day1_part_2());
+        assert_eq!(712075, day1_part_1());
+        assert_eq!(145245270, day1_part_2());
     }
 
     #[test]
     fn day2() {
-        // assert_eq!(640, day2_part_1());
-        // assert_eq!(472, day2_part_2());
+        assert_eq!(640, day2_part_1());
+        assert_eq!(472, day2_part_2());
     }
 
     #[test]
     fn day3() {
-        // assert_eq!(232, day3_part_1());
-        // assert_eq!(3952291680, day3_part_2());
+        assert_eq!(232, day3_part_1());
+        assert_eq!(3952291680, day3_part_2());
     }
 
     #[test]
     fn day4() {
-        // assert_eq!(230, day4_part_1());
-        // assert_eq!(156, day4_part_2());
+        assert_eq!(230, day4_part_1());
+        assert_eq!(156, day4_part_2());
     }
 
     #[test]
     fn day5() {
-        // assert_eq!(928, day5_part_1());
-        // assert_eq!(610, day5_part_2());
+        assert_eq!(928, day5_part_1());
+        assert_eq!(610, day5_part_2());
     }
 
     #[test]
