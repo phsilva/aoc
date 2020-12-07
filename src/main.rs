@@ -1,9 +1,6 @@
 #![feature(iterator_fold_self)]
 
-use std::{
-    collections::HashMap,
-    io::{self, BufRead},
-};
+use std::io::{self, BufRead};
 use std::{collections::HashSet, fs};
 
 pub fn day1_part_1() -> Option<(i32, i32, i32)> {
@@ -491,26 +488,15 @@ pub fn day6_part_2() -> u32 {
     sum_ansers
 }
 
-#[derive(Debug)]
-pub struct Bag {
-    color: String,
-}
-
 fn day7_input() -> Vec<(String, String, i32)> {
     let file = fs::File::open("src/day7.input.txt").unwrap();
     let reader = io::BufReader::new(file);
-    let mut nodes = HashMap::new();
     let mut edges = Vec::new();
 
     for line in reader.lines() {
         let line = line.unwrap();
         let parts: Vec<&str> = line.split("contain").collect();
         let this_bag_color = parts[0].split(' ').take(2).collect::<Vec<&str>>().join(" ");
-        let this_bag = Bag {
-            color: this_bag_color.clone(),
-        };
-
-        nodes.insert(this_bag_color.clone(), this_bag);
 
         let bag_links: Vec<&str> = parts[1].split(',').collect();
         for bag_link in bag_links {
@@ -521,13 +507,9 @@ fn day7_input() -> Vec<(String, String, i32)> {
                 .take(2)
                 .collect::<Vec<&str>>()
                 .join(" ");
-            let other_bag = Bag {
-                color: other_bag_color.clone(),
-            };
             let bag_link_parts = bag_link.trim().split(' ').collect::<Vec<&str>>();
 
             let other_bag_capacity: i32 = bag_link_parts[0].parse().unwrap_or(0);
-            nodes.insert(other_bag_color.clone(), other_bag);
             edges.push((
                 this_bag_color.clone(),
                 other_bag_color.clone(),
@@ -609,19 +591,43 @@ mod test {
     use super::*;
 
     #[test]
-    fn aoc2020() {
+    fn day1() {
         assert_eq!((455, 1565, 712075), day1_part_1().unwrap());
         // assert_eq!((1142,695,183,145245270), day1_part_2());
+    }
+
+    #[test]
+    fn day2() {
         // assert_eq!(640, day2_part_1());
         // assert_eq!(472, day2_part_2());
+    }
+
+    #[test]
+    fn day3() {
         // assert_eq!(232, day3_part_1());
         // assert_eq!(3952291680, day3_part_2());
+    }
+
+    #[test]
+    fn day4() {
         // assert_eq!(230, day4_part_1());
         // assert_eq!(156, day4_part_2());
+    }
+
+    #[test]
+    fn day5() {
         // assert_eq!(928, day5_part_1());
         // assert_eq!(610, day5_part_2());
+    }
+
+    #[test]
+    fn day6() {
         assert_eq!(6521, day6_part_1());
         assert_eq!(3305, day6_part_2());
+    }
+
+    #[test]
+    fn day7() {
         assert_eq!(126, day7_part_1());
         assert_eq!(220149, day7_part_2());
     }
