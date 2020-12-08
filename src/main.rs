@@ -592,7 +592,13 @@ pub fn day7_part_2() -> i32 {
 pub enum Instruction {
     Acc(i32),
     Jmp(i32),
-    Nop,
+    Nop(i32),
+}
+
+#[derive(Eq, PartialEq)]
+pub enum HaltState {
+    EndOfProgram,
+    InfiniteLoop,
 }
 
 pub struct Computer {
@@ -603,12 +609,21 @@ pub struct Computer {
 }
 
 impl Computer {
-    pub fn run(&mut self) -> i32 {
+    pub fn run(&mut self) -> (HaltState, i32) {
+        let halt_state;
+        let n_ins = self.instructions.len();
+
         loop {
+            if self.pc as usize >= n_ins {
+                halt_state = HaltState::EndOfProgram;
+                break;
+            }
+
             let ins = self.instructions[self.pc as usize];
 
             // halt on pc repetition
             if self.trace.contains(&self.pc) {
+                halt_state = HaltState::InfiniteLoop;
                 break;
             }
 
@@ -617,11 +632,11 @@ impl Computer {
             match ins {
                 Instruction::Acc(n) => self.acc(n),
                 Instruction::Jmp(n) => self.jmp(n),
-                Instruction::Nop => self.nop(),
+                Instruction::Nop(_) => self.nop(),
             }
         }
 
-        self.a
+        (halt_state, self.a)
     }
 
     pub fn acc(&mut self, n: i32) {
@@ -635,6 +650,12 @@ impl Computer {
 
     pub fn nop(&mut self) {
         self.pc += 1;
+    }
+
+    pub fn reset(&mut self) {
+        self.a = 0;
+        self.pc = 0;
+        self.trace = HashSet::default();
     }
 }
 
@@ -651,8 +672,8 @@ fn day8_input() -> Computer {
         let ins = match parts[0] {
             "acc" => Instruction::Acc(n),
             "jmp" => Instruction::Jmp(n),
-            "nop" => Instruction::Nop,
-            _ => Instruction::Nop,
+            "nop" => Instruction::Nop(n),
+            _ => panic!(),
         };
 
         instructions.push(ins);
@@ -661,25 +682,52 @@ fn day8_input() -> Computer {
     Computer {
         a: 0,
         pc: 0,
-        instructions: instructions.clone(),
+        instructions,
         trace: HashSet::default(),
     }
 }
 
 pub fn day8_part_1() -> i32 {
     let mut computer = day8_input();
-    let last_a_before_halt = computer.run();
-    println!("day8/1: {}", last_a_before_halt);
-    last_a_before_halt
+    let (_, a) = computer.run();
+    println!("day8/1: {}", a);
+    a
 }
 
 pub fn day8_part_2() -> i32 {
-    0
+    let mut computer = day8_input();
+    let mut last_a = 0;
+
+    let n_ins = computer.instructions.len();
+
+    for i in 0..n_ins {
+        let target_ins = computer.instructions[i as usize];
+        let mutated_ins = match target_ins {
+            Instruction::Jmp(n) => Some(Instruction::Nop(n)),
+            Instruction::Nop(n) => Some(Instruction::Jmp(n)),
+            _ => None,
+        };
+
+        if let Some(ins) = mutated_ins {
+            computer.instructions[i] = ins;
+        }
+
+        let (halt_state, a) = computer.run();
+        if halt_state == HaltState::EndOfProgram {
+            last_a = a;
+            break;
+        }
+
+        // restore mutated ins and reset our computer
+        computer.instructions[i] = target_ins;
+        computer.reset();
+    }
+
+    println!("day8/2: {}", last_a);
+    last_a
 }
 
-fn main() {
-    day8_part_1();
-}
+fn main() {}
 
 #[cfg(test)]
 mod test {
@@ -730,6 +778,6 @@ mod test {
     #[test]
     fn day8() {
         assert_eq!(2080, day8_part_1());
-        assert_eq!(0, day8_part_2());
+        assert_eq!(2477, day8_part_2());
     }
 }
