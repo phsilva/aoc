@@ -588,7 +588,98 @@ pub fn day7_part_2() -> i32 {
     total_bags
 }
 
-fn main() {}
+#[derive(Copy, Clone, Debug)]
+pub enum Instruction {
+    Acc(i32),
+    Jmp(i32),
+    Nop,
+}
+
+pub struct Computer {
+    a: i32,
+    pc: u32,
+    instructions: Vec<Instruction>,
+    trace: HashSet<u32>,
+}
+
+impl Computer {
+    pub fn run(&mut self) -> i32 {
+        loop {
+            let ins = self.instructions[self.pc as usize];
+
+            // halt on pc repetition
+            if self.trace.contains(&self.pc) {
+                break;
+            }
+
+            self.trace.insert(self.pc);
+
+            match ins {
+                Instruction::Acc(n) => self.acc(n),
+                Instruction::Jmp(n) => self.jmp(n),
+                Instruction::Nop => self.nop(),
+            }
+        }
+
+        self.a
+    }
+
+    pub fn acc(&mut self, n: i32) {
+        self.a += n;
+        self.pc += 1;
+    }
+
+    pub fn jmp(&mut self, n: i32) {
+        self.pc = ((self.pc as i32) + n) as u32;
+    }
+
+    pub fn nop(&mut self) {
+        self.pc += 1;
+    }
+}
+
+fn day8_input() -> Computer {
+    let file = fs::File::open("src/day8.input.txt").unwrap();
+    let reader = io::BufReader::new(file);
+    let mut instructions = Vec::new();
+
+    for line in reader.lines() {
+        let line = line.unwrap();
+        let parts: Vec<&str> = line.split(' ').collect();
+        let n = parts[1].parse().unwrap();
+
+        let ins = match parts[0] {
+            "acc" => Instruction::Acc(n),
+            "jmp" => Instruction::Jmp(n),
+            "nop" => Instruction::Nop,
+            _ => Instruction::Nop,
+        };
+
+        instructions.push(ins);
+    }
+
+    Computer {
+        a: 0,
+        pc: 0,
+        instructions: instructions.clone(),
+        trace: HashSet::default(),
+    }
+}
+
+pub fn day8_part_1() -> i32 {
+    let mut computer = day8_input();
+    let last_a_before_halt = computer.run();
+    println!("day8/1: {}", last_a_before_halt);
+    last_a_before_halt
+}
+
+pub fn day8_part_2() -> i32 {
+    0
+}
+
+fn main() {
+    day8_part_1();
+}
 
 #[cfg(test)]
 mod test {
@@ -634,5 +725,11 @@ mod test {
     fn day7() {
         assert_eq!(126, day7_part_1());
         assert_eq!(220149, day7_part_2());
+    }
+
+    #[test]
+    fn day8() {
+        assert_eq!(2080, day8_part_1());
+        assert_eq!(0, day8_part_2());
     }
 }
