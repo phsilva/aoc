@@ -775,15 +775,29 @@ pub fn day9_part_1() -> i64 {
 }
 
 pub fn day9_part_2() -> i32 {
-    // let xmas = day9_input();
-    // let invalid_part_1 = day9_part_1();
+    let xmas = day9_input();
+    let invalid_from_part_1 = 756008079;
+    let mut weakness = 0;
 
-    println!("day9/2: {}", 0);
+    'outer: for i in 0..(xmas.len() - 1) {
+        for j in (i + 1)..xmas.len() {
+            let set = &xmas[i..=j];
+            let sum: i64 = set.iter().sum();
+            if sum == invalid_from_part_1 {
+                let min = set.iter().min().unwrap();
+                let max = set.iter().max().unwrap();
+                weakness = min + max;
+                break 'outer;
+            }
+        }
+    }
+
+    println!("day9/2: {}", weakness);
     0
 }
 
 fn main() {
-    day9_part_1();
+    day9_part_2();
 }
 
 #[cfg(test)]
@@ -841,6 +855,6 @@ mod test {
     #[test]
     fn day9() {
         assert_eq!(756008079, day9_part_1());
-        assert_eq!(0, day9_part_2());
+        assert_eq!(93727241, day9_part_2());
     }
 }
