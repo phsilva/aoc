@@ -727,7 +727,64 @@ pub fn day8_part_2() -> i32 {
     last_a
 }
 
-fn main() {}
+fn day9_input() -> Vec<i64> {
+    let file = fs::File::open("src/day9.input.txt").unwrap();
+    let reader = io::BufReader::new(file);
+    let mut xmas = Vec::new();
+
+    for line in reader.lines() {
+        let n = line.unwrap().parse().unwrap();
+        xmas.push(n);
+    }
+
+    xmas
+}
+
+pub fn day9_part_1() -> i64 {
+    let xmas = day9_input();
+    const PREAMBLE: usize = 25;
+
+    let mut window = HashSet::<i64>::default();
+    for i in &xmas[..PREAMBLE] {
+        window.insert(*i);
+    }
+
+    let mut invalid = 0;
+
+    for i in PREAMBLE..xmas.len() {
+        let n = xmas[i];
+        let mut valid = false;
+        for w in window.iter() {
+            let diff = n - w;
+            if window.contains(&diff) {
+                valid = true;
+                break;
+            }
+        }
+        if !valid {
+            invalid = n;
+            break;
+        }
+
+        window.insert(n);
+        window.remove(&xmas[i - PREAMBLE]);
+    }
+
+    println!("day9/1: {}", invalid);
+    invalid
+}
+
+pub fn day9_part_2() -> i32 {
+    // let xmas = day9_input();
+    // let invalid_part_1 = day9_part_1();
+
+    println!("day9/2: {}", 0);
+    0
+}
+
+fn main() {
+    day9_part_1();
+}
 
 #[cfg(test)]
 mod test {
@@ -779,5 +836,11 @@ mod test {
     fn day8() {
         assert_eq!(2080, day8_part_1());
         assert_eq!(2477, day8_part_2());
+    }
+
+    #[test]
+    fn day9() {
+        assert_eq!(756008079, day9_part_1());
+        assert_eq!(0, day9_part_2());
     }
 }
