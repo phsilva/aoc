@@ -1,10 +1,8 @@
-#![feature(iterator_fold_self)]
-
 use std::io::{self, BufRead};
 use std::{collections::HashSet, fs};
 
 pub fn day1_part_1() -> i32 {
-    let file = fs::File::open("src/day1.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day1.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let nums: Vec<i32> = reader
         .lines()
@@ -26,7 +24,7 @@ pub fn day1_part_1() -> i32 {
 }
 
 pub fn day1_part_2() -> i32 {
-    let file = fs::File::open("src/day1.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day1.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let nums: Vec<i32> = reader
         .lines()
@@ -76,7 +74,7 @@ impl PasswordPolicy {
 }
 
 pub fn day2_input() -> Vec<(String, PasswordPolicy)> {
-    let file = fs::File::open("src/day2.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day2.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let passwords: Vec<(String, PasswordPolicy)> = reader
         .lines()
@@ -132,7 +130,7 @@ pub fn day2_part_2() -> i32 {
 type Day3Map = Vec<Vec<char>>;
 
 pub fn day3_input() -> Day3Map {
-    let file = fs::File::open("src/day3.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day3.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let map: Day3Map = reader
         .lines()
@@ -335,7 +333,7 @@ impl Passport {
 }
 
 pub fn day4_input() -> Vec<Passport> {
-    let file = fs::File::open("src/day4.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day4.input.txt").unwrap();
     let reader = io::BufReader::new(file);
 
     let mut passports = Vec::new();
@@ -413,7 +411,7 @@ pub fn seat_id(seat: (u8, u8)) -> u32 {
 }
 
 fn day5_input() -> Vec<String> {
-    let file = fs::File::open("src/day5.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day5.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let boarding_passes: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
     boarding_passes
@@ -451,7 +449,7 @@ pub fn day5_part_2() -> u32 {
 }
 
 fn day6_input() -> Vec<Vec<String>> {
-    let file = fs::File::open("src/day6.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day6.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let mut answers = Vec::new();
 
@@ -498,7 +496,7 @@ pub fn day6_part_2() -> u32 {
         let bit_answers: Vec<u32> = group.iter().map(|answer| str_as_bits(answer)).collect();
         sum_ansers += bit_answers
             .into_iter()
-            .fold_first(|a, b| a & b)
+            .reduce(|a, b| a & b)
             .unwrap()
             .count_ones();
     }
@@ -508,7 +506,7 @@ pub fn day6_part_2() -> u32 {
 }
 
 fn day7_input() -> Vec<(String, String, i32)> {
-    let file = fs::File::open("src/day7.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day7.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let mut edges = Vec::new();
 
@@ -660,7 +658,7 @@ impl Computer {
 }
 
 fn day8_input() -> Computer {
-    let file = fs::File::open("src/day8.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day8.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let mut instructions = Vec::new();
 
@@ -728,7 +726,7 @@ pub fn day8_part_2() -> i32 {
 }
 
 fn day9_input() -> Vec<i64> {
-    let file = fs::File::open("src/day9.input.txt").unwrap();
+    let file = fs::File::open("2020/src/day9.input.txt").unwrap();
     let reader = io::BufReader::new(file);
     let mut xmas = Vec::new();
 
