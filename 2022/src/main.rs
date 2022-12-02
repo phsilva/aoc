@@ -27,8 +27,6 @@ pub fn day1() -> (i32, i32) {
     )
 }
 
-fn main() {}
-
 #[cfg(test)]
 mod test {
     use super::*;
