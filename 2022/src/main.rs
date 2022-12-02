@@ -1,23 +1,15 @@
 use std::fs;
-use std::io::{self, BufRead};
 
 pub fn day1() -> (i32, i32) {
-    let file = fs::File::open("src/day1.input.txt").unwrap();
-    let reader = io::BufReader::new(file);
-    let calories = reader.lines().map(|line| line.unwrap());
-
-    let mut current = 0;
-    let mut elves = Vec::new();
-
-    for calorie in calories {
-        if calorie.is_empty() {
-            elves.push(current);
-            current = 0;
-            continue;
-        }
-
-        current += calorie.parse::<i32>().unwrap();
-    }
+    let input = fs::read_to_string("src/day1.input.txt").unwrap();
+    let mut elves: Vec<_> = input
+        .split("\n\n")
+        .map(|elf| {
+            elf.split('\n')
+                .map(|calorie| calorie.parse::<i32>().unwrap())
+                .sum::<i32>()
+        })
+        .collect();
 
     elves.sort();
 
@@ -36,3 +28,5 @@ mod test {
         assert_eq!((70369, 203002), day1());
     }
 }
+
+fn main() {}
